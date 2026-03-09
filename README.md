@@ -1,6 +1,6 @@
 # Let's Standardize the 1970 Epoch!
 
-The 1970 epoch is one of those things everyone uses and nobody has ever actually written down. It survives through folklore and muscle memory. We all know what “seconds since 1970” means, but try to find a formal definition you can cite and the whole thing dissolves into hand‑waving. Even modern documents fall back on phrases like “seconds since the start of 1970 UTC, ignoring leap seconds,” which sounds authoritative until you remember that UTC didn’t exist in its modern form until 1972 and leap seconds don’t politely vanish just because a standard tells them to.
+The 1970 epoch is one of those things everyone uses and nobody has ever actually written down. It survives through folklore and muscle memory. We all know what “seconds since 1970” means, but try to find a formal definition you can cite and the whole thing dissolves into hand-waving. Even modern documents fall back on phrases like “seconds since the start of 1970 UTC, ignoring leap seconds,” which sounds authoritative until you remember that UTC didn’t exist in its modern form until 1972 and leap seconds don’t politely vanish just because a standard tells them to.
 
 Add in the awkward fact that “Unix” is a trademark, and our most widely used timestamp turns out to be a cultural artifact rather than a specification. So, rather than continuing to rely on tradition and vibes, this document proposes a precise, historically honest definition of the thing we’ve all been using anyway.
 
@@ -11,35 +11,33 @@ This is draft version 0.1 of a possible RFC and I will update this version if I 
 This document is an informational specification. It does not define an Internet Standard.
 
 ### Abstract
-This document defines 1970 Epochal Time, a timestamping system that assigns integer values to non‑leap SI seconds beginning at 1972‑01‑01T00:00:00Z. It provides a precise, citable definition of the widely used “seconds since 1970” convention while avoiding the historical ambiguities associated with pre‑1972 UTC and the trademark restrictions associated with the term “Unix time”. The system preserves numerical compatibility with existing Unix timestamps for all values greater than or equal to 63 072 000.
+This document defines 1970 Epochal Time, a timestamping system that assigns integer values to non-leap SI seconds beginning at 1972-01-01T00:00:00Z. It provides a precise, citable definition of the widely used “seconds since 1970” convention while avoiding the historical ambiguities associated with pre-1972 UTC and the trademark restrictions associated with the term “Unix time”. The system preserves numerical compatibility with existing Unix timestamps for all values greater than or equal to 63 072 000.
 
 ### 1. Introduction
-The timestamp convention commonly described as “seconds since 1970” is widely used in computing systems, but it has never been formally defined in a citable standards document. Existing practice typically describes this value as the number of elapsed seconds since 1970‑01‑01T00:00:00Z, ignoring leap seconds. This description is imprecise and ambiguous for several reasons.
+The timestamp convention commonly described as “seconds since 1970” is widely used in computing systems, but it has never been formally defined in a citable standards document. Existing practice typically describes this value as the number of elapsed seconds since 1970-01-01T00:00:00Z, ignoring leap seconds. This description is imprecise and ambiguous for several reasons.
 
-First, Coordinated Universal Time (UTC) in its modern, leap‑second‑regulated form was not introduced until 1972. No authoritative mapping exists between modern UTC and the years 1970–1971, making it unclear which exact instant in 1970 such timestamps are anchored to. Second, the instruction to “ignore leap seconds” does not specify how timestamps should behave during positive or negative leap seconds, creating ambiguity for both historical and future dates. Third, the term “Unix” is a registered trademark and is therefore unsuitable as the name of a formal standard.
+First, Coordinated Universal Time (UTC) in its modern, leap-second-regulated form was not introduced until 1972. No authoritative mapping exists between modern UTC and the years 1970–1971, making it unclear which exact instant in 1970 such timestamps are anchored to. Second, the instruction to “ignore leap seconds” does not specify how timestamps should behave during positive or negative leap seconds, creating ambiguity for both historical and future dates. Third, the term “Unix” is a registered trademark and is therefore unsuitable as the name of a formal standard.
 
 This document defines 1970 Epochal Time, a timestamping system that provides a precise, citable, and historically consistent definition of the widely used “seconds since 1970” convention. It establishes the base of this system at the beginning of 1972, the first moment at which UTC was defined in its current form, and specifies the behavior of timestamps in the presence of leap seconds while preserving numerical compatibility with existing Unix timestamps for all values from that point forward.
 
 This document is a formalization of widespread existing practice only. It does not attempt to repair or improve those practices.
 
 ### 2. Terminology
- - **UTC** — Coordinated Universal Time, including leap‑second adjustments.  
+ - **UTC** — Coordinated Universal Time, including leap-second adjustments.  
  - **SI second** — the base unit of time as defined by \[SI\].  
  - **Non-leap second** — an SI second that is not part of a leap-second insertion or deletion.  
  - **Positive leap second** — a UTC day extended to 86 401 seconds by inserting 23:59:60 (described in \[UTC\] as the insertion of a leap second).  
  - **Negative leap second** — a UTC day shortened to 86 399 seconds by omitting a second (described in \[UTC\] as the deletion of a leap second).  
 
 ### 3. Epochal Timestamp Definition and Construction
-An **Epochal Timestamp** is an integer assigned to each non‑leap SI second beginning at 1972‑01‑01T00:00:00Z. It is constructed from a Day‑Number and a Second‑Number.
+An **Epochal Timestamp** is an integer assigned to each non-leap SI second beginning at 1972-01-01T00:00:00Z. It is constructed from a Day-Number and a Second-Number.
 
-A **Day-Number** is the count of days in the 1970 Epochal Time System, with the UTC day 1972‑01‑01 defined as Day‑Number  730. (This value reflects the 730 days in the years 1970 and 1971.) The Day-Number increases by one at the start of each UTC day.
+A **Day-Number** is the count of days in the 1970 Epochal Time system, with the UTC day 1972-01-01 defined as Day-Number  730. (This value reflects the 730 days in the years 1970 and 1971.) The Day-Number increases by one at the start of each UTC day.
 
-A **Second-Number** is the count of non‑leap SI seconds within a UTC day, beginning at 0 at the start of the day and increasing by one each SI second.
+A **Second-Number** is the count of non-leap SI seconds within a UTC day, beginning at 0 at the start of the day and increasing by one each SI second.
 
-The Epochal Timestamp value itself is computed as:
-```
-Epochal Timestamp = (Day-Number × 86400) + Second-Number
-```
+The Epochal Timestamp value itself is computed as:  
+`Epochal Timestamp = (Day-Number × 86400) + Second-Number`
 
 Implementations MUST NOT assign meaning to Epochal Timestamp values less than 63 072 000 unless explicitly directed by another specification that references this. Interpretations of values less than 63 072 000 are outside the scope of this document and may lead to ambiguity or misinterpretation if not handled carefully.
 
@@ -93,5 +91,4 @@ The author acknowledges the widespread informal use of “seconds since 1970”.
  - \[UTC\] ITU‑R TF.460‑6, “Standard-frequency and time-signal emissions,” International Telecommunication Union, 2015. 
 	- https://www.itu.int/dms_pubrec/itu-r/rec/tf/R-REC-TF.460-6-201506-I!!PDF-E.pdf
  - \[SI\] BIPM, “The International System of Units (SI),” 2019.
-	- https://www.bipm.org/en/publications/si-brochure]
-	
+	- https://www.bipm.org/en/publications/si-brochure
