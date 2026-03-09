@@ -23,35 +23,51 @@ This document defines 1970 Epochal Time, a timestamping system that provides a p
 This document is a formalization of widespread existing practice only. It does not attempt to repair or improve those practices.
 
 ### 2. Terminology
-**UTC** — Coordinated Universal Time, including leap‑second adjustments.  
-**SI second** — the base unit of time as defined by the International System of Units.  
-**Non-leap second** — the first 86400 seconds of each UTC day, not including a positive leap-second.  
-**Positive leap second** — a UTC day extended to 86 401 seconds by inserting 23:59:60 (described in ITU‑R TF.460 as the insertion of a leap second).  
-**Negative leap second** — a UTC day shortened to 86 399 seconds by omitting a second (described in ITU‑R TF.460 as the deletion of a leap second).  
+ - **UTC** — Coordinated Universal Time, including leap‑second adjustments.  
+ - **SI second** — the base unit of time as defined by \[SI\].  
+ - **Non-leap second** — an SI second that is not part of a leap-second insertion or deletion.  
+ - **Positive leap second** — a UTC day extended to 86 401 seconds by inserting 23:59:60 (described in \[UTC\] as the insertion of a leap second).  
+ - **Negative leap second** — a UTC day shortened to 86 399 seconds by omitting a second (described in \[UTC\] as the deletion of a leap second).  
 
 ### 3. Epochal Timestamp Definition and Construction
 An **Epochal Timestamp** is an integer assigned to each non‑leap SI second beginning at 1972‑01‑01T00:00:00Z. It is constructed from a Day‑Number and a Second‑Number.
 
-A **Day Number** is the count of days where the UTC date 1972‑01‑01 is Day‑Number 730 and increasing by one every UTC day.
+A **Day-Number** is the count of days in the 1970 Epochal Time System, with the UTC day 1972‑01‑01 defined as Day‑Number  730. (This value reflects the 730 days in the years 1970 and 1971.) The Day-Number increases by one at the start of each UTC day.
 
-A **Second Number** is the count of non‑leap SI seconds within a UTC day, beginning at 0 at the start of the day and increasing by one each SI second.
+A **Second-Number** is the count of non‑leap SI seconds within a UTC day, beginning at 0 at the start of the day and increasing by one each SI second.
 
 The Epochal Timestamp value itself is computed as:
 ```
-Epochal-Timestamp = (Day-Number × 86400) + Second-Number
+Epochal Timestamp = (Day-Number × 86400) + Second-Number
 ```
-All Epochal Timestamp values less than 63 072 000 are undefined by this document. Dates prior to 1972‑01‑01 have no defined Epochal Timestamp value. Other specifications may assign meaning to these values and dates, but such interpretations are outside the scope of this document.
+
+Implementations MUST NOT assign meaning to Epochal Timestamp values less than 63 072 000 unless explicitly directed by another specification that references this. Interpretations of values less than 63 072 000 are outside the scope of this document and may lead to ambiguity or misinterpretation if not handled carefully.
 
 ### 4. Leap Seconds
-On UTC days containing a positive leap second, the inserted second (23:59:60) has no defined Epochal Timestamp value. The sequence proceeds directly from the Epochal Timestamp corresponding to 23:59:59 to the Epochal Timestamp corresponding to 00:00:00 of the next day.
+On UTC days containing a positive leap second, the inserted second (23:59:60) has no defined Epochal Timestamp value. The sequence proceeds directly from the Epochal Timestamp for the SI second labelled 23:59:59 to the Epochal Timestamp for the SI second labelled 00:00:00 for the next day.
 
-On UTC days containing a negative leap second, the UTC day is 86 399 seconds long. The final valid Second Number for that day is 86 398. The Epochal Timestamp value that would have corresponded to the omitted second is undefined and the sequence remains continuous.
+On UTC days containing a negative leap second, the UTC day is 86 399 seconds long. The final valid Second-Number for that day is 86 398. The Epochal Timestamp value that would have corresponded to the omitted UTC-labelled second is undefined and the sequence remains continuous.
+
+#### 4.1 Examples (Non‑Normative)
+
+Historical positive leap second on 2016‑12‑31:
+| UTC Time             | Day-Number | Second-Number | Epochal Timestamp |
+|----------------------|------------|---------------|-------------------|
+| 2016‑12‑31T23:59:59Z | 16790      | 86399         | 1483228799        |
+| 2016‑12‑31T23:59:60Z | 16790      | N/A           | N/A               |
+| 2017‑01‑01T00:00:00Z | 16791      | 0             | 1483228800        |
+
+Hypothetical negative leap second on 2030‑06‑30:
+| UTC Time             | Day-Number | Second-Number | Epochal Timestamp |
+|----------------------|------------|---------------|-------------------|
+| 2030‑06‑30T23:59:58Z | 21915      | 86398         | 1909094399        |
+| 2030‑07‑01T00:00:00Z | 21916      | 0             | 1909094400        |
 
 ### 5. Note on Sub‑Second Extensions (Non‑Normative)
 This document defines only integer Epochal Timestamp values. Specifications referencing this document may extend the representation of time into sub‑second precision using fractional values, fixed‑precision multipliers (such as milliseconds or nanoseconds), or any other encoding appropriate to the referencing specification. Sub‑second representation is outside the scope of this document.
 
 ### 6. Note on Clock Accuracy (Non‑Normative)
-This document defines only the mapping between non-leap UTC seconds and integer Epochal Timestamp values. It does not specify how systems obtain or maintain the current time. Implementations may use local oscillators, network time protocols, hardware clocks, or any other mechanism to determine the present UTC second. The accuracy of the resulting Epochal Timestamp value depends on the accuracy of the underlying time source. Incorrect, drifting, or unsynchronized clocks will produce incorrect Epochal Timestamp values. This specification does not guarantee that any particular system will identify UTC seconds correctly.
+This document defines only the mapping between non-leap SI seconds and integer Epochal Timestamp values. It does not specify how systems obtain or maintain the current time. Implementations may use local oscillators, network time protocols, hardware clocks, or any other mechanism to determine the present UTC second. The accuracy of the resulting Epochal Timestamp value depends on the accuracy of the underlying time source. Incorrect, drifting, or unsynchronized clocks will produce incorrect Epochal Timestamp values. This specification does not guarantee that any particular system will identify UTC seconds correctly.
 
 ### 7. Compatibility
 All Epochal Timestamp values greater than 63 072 000 are numerically identical to Unix time as commonly implemented. This document does not define the meaning of timestamps below this value.
@@ -63,6 +79,8 @@ Incorrect or maliciously altered time sources may cause implementations to gener
 
 Ambiguities arising from timestamps outside the defined range (values less than 63 072 000) may lead to misinterpretation if implementations assign meaning to undefined values. Specifications that extend or reinterpret these values must consider the security implications of doing so.
 
+Positive leap seconds, which have no defined Epochal Timestamp value, may cause discontinuities in time‑based calculations or comparisons. Systems that must handle leap seconds should be designed to accommodate these discontinuities appropriately. Systems that repeat a single timestamp value during a positive leap second (treating 23:59:60 as 23:59:59) may introduce ambiguity or may represent a window for a replay attack.
+
 ### 9. IANA Considerations
 This document requires no IANA actions.
 
@@ -70,3 +88,10 @@ This document requires no IANA actions.
 The author acknowledges the widespread informal use of “seconds since 1970”.
 
 “UNIX” and “Unix”, at time of writing, are trademarks of The Open Group.
+
+### 11. References
+ - \[UTC\] ITU‑R TF.460‑6, “Standard-frequency and time-signal emissions,” International Telecommunication Union, 2015. 
+	- https://www.itu.int/dms_pubrec/itu-r/rec/tf/R-REC-TF.460-6-201506-I!!PDF-E.pdf
+ - \[SI\] BIPM, “The International System of Units (SI),” 2019.
+	- https://www.bipm.org/en/publications/si-brochure]
+	
